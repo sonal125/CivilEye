@@ -361,7 +361,7 @@ Recommended demo approach:
 
 For ready-to-import Postman requests, use: `CivilEye_Postman_Collection.json`.
 - **Role**: Admin
-- **Visible name**: Ankit 
+- **Visible name**: Sonal
 
 ---
 
