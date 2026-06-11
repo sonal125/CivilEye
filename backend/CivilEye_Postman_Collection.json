@@ -1,0 +1,325 @@
+{
+  "info": {
+    "_postman_id": "7b3d0f7e-0c5d-4a2e-9b7c-8f57c4b22c13",
+    "name": "CivilEye Backend API Collection",
+    "description": "Exportable Postman collection (v2.1) for the CivilEye backend APIs.\n\nBase URL is configured via the collection variable {{base_url}} (default: http://localhost:5001).\nProtected routes use Authorization: Bearer {{auth_token}}.\n\nSuggested order for demo: Register → Login (auto-saves token) → Create Complaint → Get All → Get By ID → Comment/Upvote → Admin routes (admin token required).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "<JWT_TOKEN_PLACEHOLDER>",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints (Register + Login). Login request auto-saves JWT to {{auth_token}}.",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@civileye.com\",\n  \"password\": \"password123\",\n  \"role\": \"citizen\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/api/auth/register",
+            "description": "Register a new user (default role: citizen). Admin registration is restricted via ADMIN_INVITE_CODE (see backend docs)."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User (Saves Token → {{auth_token}})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Save JWT token from response into collection variable auth_token",
+                  "pm.test('Login returns success=true', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('success');",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('Token is present at data.token', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.nested.property('data.token');",
+                  "  pm.expect(json.data.token).to.be.a('string').and.not.empty;",
+                  "  pm.collectionVariables.set('auth_token', json.data.token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@civileye.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/api/auth/login",
+            "description": "Login and receive a JWT. The Tests tab script automatically stores the JWT into collection variable {{auth_token}}."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Complaints",
+      "description": "Complaint CRUD-style endpoints plus upvotes and comments.",
+      "item": [
+        {
+          "name": "Create Complaint (Image + Location)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Large pothole near market",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "A pothole is causing traffic and is dangerous for two-wheelers.",
+                  "type": "text"
+                },
+                {
+                  "key": "issueType",
+                  "value": "pothole",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "latitude",
+                  "value": "28.6139",
+                  "type": "text"
+                },
+                {
+                  "key": "longitude",
+                  "value": "77.2090",
+                  "type": "text"
+                },
+                {
+                  "key": "altitude",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "accuracy",
+                  "value": "12",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "Connaught Place, New Delhi",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{base_url}}/api/complaints",
+            "description": "Create a complaint with an image upload and location metadata. Requires auth.\n\nIn Postman: choose a real file for the 'image' field."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Complaints",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "disabled": true
+              }
+            ],
+            "url": "{{base_url}}/api/complaints",
+            "description": "Public feed list. Authorization header is optional (disabled by default).\n\nOptional query params: status, issueType, priority, sortBy."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Complaint By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/complaints/:id",
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<COMPLAINT_ID>",
+                  "description": "MongoDB ObjectId of a complaint"
+                }
+              ]
+            },
+            "description": "Fetch complaint details and latest comments (public endpoint).\n\nSet :id in Path Variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Upvote Complaint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/complaints/:id/upvote",
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<COMPLAINT_ID>",
+                  "description": "MongoDB ObjectId of a complaint"
+                }
+              ]
+            },
+            "description": "Upvote a complaint (auth required). Set :id in Path Variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"This issue needs urgent attention.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/complaints/:id/comment",
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<COMPLAINT_ID>",
+                  "description": "MongoDB ObjectId of a complaint"
+                }
+              ]
+            },
+            "description": "Add a comment to a complaint (auth required). Set :id in Path Variables."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "description": "Admin-only endpoints (requires a JWT for a user with role=admin).",
+      "item": [
+        {
+          "name": "Update Complaint Status (Admin Only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/complaints/:id/status",
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<COMPLAINT_ID>",
+                  "description": "MongoDB ObjectId of a complaint"
+                }
+              ]
+            },
+            "description": "Admin-only status update. Set :id in Path Variables.\n\nBackend normalizes status strings (e.g., 'In Progress' → 'in-progress')."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Admin Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/analytics",
+            "description": "Admin-only analytics: returns complaint counts by status."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

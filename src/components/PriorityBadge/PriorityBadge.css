@@ -1,0 +1,61 @@
+/**
+ * PriorityBadge.css
+ * 
+ * Purpose: Styles for complaint priority badges
+ * 
+ * Responsibilities:
+ * - Define color schemes for each priority level
+ * - Create consistent badge styling
+ * - Ensure visual distinction between levels
+ * 
+ * CivilEye Context:
+ * Professional priority indicators for civic issue tracking.
+ */
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.priority-icon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.priority-critical {
+  background-color: rgba(220, 38, 38, 0.15);
+  color: #991b1b;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.priority-high {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #92400e;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.priority-medium {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #1e40af;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.priority-low {
+  background-color: rgba(107, 114, 128, 0.15);
+  color: #374151;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.priority-default {
+  background-color: var(--color-gray-100);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-medium);
+}

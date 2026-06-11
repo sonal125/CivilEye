@@ -1,0 +1,53 @@
+/**
+ * App.css
+ * 
+ * Purpose: Core application layout styles for CivilEye
+ * 
+ * Responsibilities:
+ * - Define main application structure
+ * - Set up flex layout for header, content, footer
+ * - Ensure footer stays at bottom
+ * 
+ * CivilEye Context:
+ * Creates the professional layout structure for the entire civic platform.
+ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Ensure main content doesn't overlap with fixed navbar */
+.main-content {
+  margin-top: 70px;
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-in, transform 300ms ease-in;
+}
+
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
